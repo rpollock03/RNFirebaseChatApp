@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Button, Input } from "react-native-elements"
 
+import { auth } from "../firebase/config"
+
 
 const LoginScreen = () => {
 
@@ -9,6 +11,29 @@ const LoginScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [imageUrl, setImageUrl] = useState('');
+
+    const register = () => {
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                //SIGNED IN
+                let user = userCredential.user
+                user.updateProfile({
+                    displayName: name,
+                    displayName: name,
+                    photoURL: imageUrl ? imageUrl : "https://www.trackergps.com/canvas/images/icons/avatar.jpg"
+                })
+                    .catch(function (error) {
+                        alert(error.message)
+                    })
+            })
+            .catch((error) => {
+                var errorMessage = error.message;
+                alert(errorMessage)
+            });
+    }
+
+
 
     return (
         <View style={styles.container}>
@@ -41,6 +66,7 @@ const LoginScreen = () => {
             />
             <Button
                 title="register" style={styles.button}
+                onPress={register}
             />
         </View>
     )
