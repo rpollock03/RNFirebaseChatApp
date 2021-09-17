@@ -5,14 +5,14 @@ import { Button, Input } from "react-native-elements"
 import { auth } from "../firebase/config"
 
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [imageUrl, setImageUrl] = useState('');
 
-    const register = () => {
+    const register = ({ navigation }) => {
 
         auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
@@ -26,9 +26,10 @@ const LoginScreen = () => {
                     .catch(function (error) {
                         alert(error.message)
                     })
+                navigation.popToTop()
             })
             .catch((error) => {
-                var errorMessage = error.message;
+                let errorMessage = error.message;
                 alert(errorMessage)
             });
     }
@@ -83,4 +84,4 @@ const styles = StyleSheet.create({
         marginTop: 10
     }
 })
-export default LoginScreen
+export default RegisterScreen

@@ -14,7 +14,8 @@ const LoginScreen = ({ navigation }) => {
             if (user) {
                 navigation.replace('Chat');
             } else {
-                // No user is signed in.
+                //prevent back button after user logs out
+                navigation.canGoBack() && navigation.popToTop()
             }
         });
         return unsubscribe;
