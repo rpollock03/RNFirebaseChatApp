@@ -6,12 +6,15 @@ import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import ChatScreen from './screens/ChatScreen';
 
+import LandingScreen from "./screens/LandingScreen"
+
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator >
+        <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />

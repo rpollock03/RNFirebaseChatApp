@@ -43,21 +43,6 @@ const ChatScreen = ({ navigation }) => {
         });
     }
 
-    useEffect(() => {
-        setMessages([
-            {
-                _id: 1,
-                text: 'Hello developer',
-                createdAt: new Date(),
-                user: {
-                    _id: 2,
-                    name: 'React Native',
-                    avatar: 'https://placeimg.com/140/140/any',
-                },
-            },
-        ])
-    }, [])
-
     useLayoutEffect(() => {
         const unsubscribe = db.collection('chats').orderBy('createdAt', 'desc').onSnapshot(snapshot => setMessages(
             snapshot.docs.map(doc => ({
