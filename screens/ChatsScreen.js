@@ -31,12 +31,21 @@ const ChatsScreen = () => {
             })
     }
 
+    const newChat = (user) => {
+        // user to begin chatting with
+        console.log(user)
+        //now we navigat to a new chat, passing user.id
+        //we also create new chat collection for the users involved.
+        //but that would be duplicating no? shittttt
+    }
 
 
     return (<View>
         <Text>This is the chats screen, all your chats are here!</Text>
         <Button title="new chat" onPress={toggleOverlay} />
-        <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
+        <Overlay isVisible={visible} onBackdropPress={toggleOverlay}
+            overlayStyle={{ width: "80%", height: "80%", }}
+        >
             <Text>Who do you want to chat with?</Text>
             <SearchBar
                 placeholder="Search for a user"
@@ -52,14 +61,14 @@ const ChatsScreen = () => {
                 horizontal={false}
                 renderItem={({ item }) => {
                     return (
-                        <TouchableOpacity onPress={() => props.navigation.navigate("Profile", { uid: item.id })
-                        }>
+                        <TouchableOpacity onPress={() => newChat(item)}>
                             <ListItem bottomDivider>
                                 <Avatar source={{ uri: item.photoUrl }} />
                                 <ListItem.Content>
                                     <ListItem.Title>{item.displayName}</ListItem.Title>
                                     <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
                                 </ListItem.Content>
+                                <ListItem.Chevron type="MaterialIcons" name="group-add" size={44} />
                             </ListItem>
                         </TouchableOpacity>
                     )
@@ -76,5 +85,6 @@ const ChatsScreen = () => {
 
     )
 }
+
 
 export default ChatsScreen
