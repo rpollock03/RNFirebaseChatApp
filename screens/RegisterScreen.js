@@ -5,14 +5,14 @@ import { Button, Input } from "react-native-elements"
 import { auth } from "../firebase/config"
 
 
-const RegisterScreen = () => {
+const RegisterScreen = ({ navigation }) => {
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [imageUrl, setImageUrl] = useState('');
 
-    const register = ({ navigation }) => {
+    const register = () => {
 
         auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {

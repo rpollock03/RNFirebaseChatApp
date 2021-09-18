@@ -76,12 +76,15 @@ const ChatScreen = ({ navigation }) => {
 
     return (
         <GiftedChat
+            showAvatarForEveryMessage={true}
+            showUserAvatar={true}
+            renderAvatarOnTop
             messages={messages}
+            avatarSize={50}
             onSend={messages => onSend(messages)}
             user={{
                 _id: 1,
             }}
-            showAvatarForEveryMessage={true}
             user={{
                 _id: auth?.currentUser?.email,
                 name: auth?.currentUser?.displayName,
