@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Button, Input } from "react-native-elements"
 
-import { auth } from "../firebase/config"
+import { auth, db } from "../firebase/config"
 
 
 const RegisterScreen = ({ navigation }) => {
@@ -17,15 +17,26 @@ const RegisterScreen = ({ navigation }) => {
         auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 //SIGNED IN
+                //creates new user, but basically just email and password data, no displayname etc is stored. So we update the user object
                 let user = userCredential.user
                 user.updateProfile({
                     displayName: name,
-                    displayName: name,
+                    email: email,
                     photoURL: imageUrl ? imageUrl : "https://www.trackergps.com/canvas/images/icons/avatar.jpg"
                 })
                     .catch(function (error) {
                         alert(error.message)
                     })
+                //this part adds user to the collection
+                db.collection("users").doc(auth.currentUser.uid).set({
+                    displayName: name,
+                    email,
+                    photoUrl: imageUrl ? imageUrl : "https://www.trackergps.com/canvas/images/icons/avatar.jpg"
+                })
+                    .catch(function (error) {
+                        alert(error.message)
+                    })
+                console.log(user)
                 navigation.popToTop()
             })
             .catch((error) => {

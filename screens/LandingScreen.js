@@ -38,7 +38,7 @@ const LandingScreen = ({ navigation }) => {
         <Text h2 style={styles.title}>What's the craic?</Text>
         <Text h4 style={styles.subtitle}>An Irish Messaging service</Text>
         {currentUser ? <Button title={`Continue as @${currentUser}`}
-            onPress={() => navigation.navigate("Chat")} />
+            onPress={() => navigation.navigate("Chats")} />
             : <Button title="Sign in" onPress={() => navigation.replace("Login")} />}
 
         {currentUser ? <Button type="clear" title="Switch account" onPress={signOut} /> : null}

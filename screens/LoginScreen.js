@@ -12,7 +12,7 @@ const LoginScreen = ({ navigation }) => {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(function (user) {
             if (user) {
-                navigation.replace('Chat');
+                navigation.replace('Chats');
             } else {
                 //prevent back button after user logs out
                 navigation.canGoBack() && navigation.popToTop()
