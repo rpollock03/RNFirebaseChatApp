@@ -27,7 +27,7 @@ const RegisterScreen = ({ navigation }) => {
                     .catch(function (error) {
                         alert(error.message)
                     })
-                //this part adds user to the collection
+                //this part adds user to the users collection on firebase
                 db.collection("users").doc(auth.currentUser.uid).set({
                     displayName: name,
                     email,
@@ -36,12 +36,10 @@ const RegisterScreen = ({ navigation }) => {
                     .catch(function (error) {
                         alert(error.message)
                     })
-                console.log(user)
                 navigation.popToTop()
             })
             .catch((error) => {
-                let errorMessage = error.message;
-                alert(errorMessage)
+                alert(error.message)
             });
     }
 
