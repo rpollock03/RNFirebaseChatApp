@@ -5,12 +5,12 @@ import { GiftedChat } from 'react-native-gifted-chat'
 
 import { auth, db } from "../firebase/config"
 
-const ChatScreen = ({ navigation }) => {
+const ChatScreen = (props) => {
 
     const [messages, setMessages] = useState([]);
 
     useLayoutEffect(() => {
-        navigation.setOptions({
+        props.navigation.setOptions({
             // title: value === '' ? 'No title' : value,
             headerLeft: () => (
                 <View style={{ marginLeft: 20 }}>
@@ -32,19 +32,20 @@ const ChatScreen = ({ navigation }) => {
                 </TouchableOpacity>
             )
         });
-    }, [navigation]);
+    }, [props.navigation]);
 
     const signOut = () => {
         auth.signOut().then(() => {
             // Sign-out successful.
-            navigation.replace("Login");
+            props.navigation.replace("Login");
         }).catch((error) => {
             // An error happened.
         });
     }
 
+
     useLayoutEffect(() => {
-        const unsubscribe = db.collection('chats').orderBy('createdAt', 'desc').onSnapshot(snapshot => setMessages(
+        const unsubscribe = db.collection('chats').doc(props.route.params.chatId).collection('messages').orderBy('createdAt', 'desc').onSnapshot(snapshot => setMessages(
             snapshot.docs.map(doc => ({
                 _id: doc.data()._id,
                 createdAt: doc.data().createdAt.toDate(),
@@ -66,7 +67,9 @@ const ChatScreen = ({ navigation }) => {
             user,
         } = messages[0]
 
-        db.collection('chats').add({
+
+
+        db.collection('chats').doc(props.route.params.chatId).collection('messages').add({
             _id,
             createdAt,
             text,
@@ -80,7 +83,7 @@ const ChatScreen = ({ navigation }) => {
             showUserAvatar={true}
             renderAvatarOnTop
             messages={messages}
-            avatarSize={50}
+
             onSend={messages => onSend(messages)}
             user={{
                 _id: 1,
