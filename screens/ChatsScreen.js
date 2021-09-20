@@ -3,9 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native
 
 import { auth, db } from "../firebase/config"
 import { Avatar, Icon, Button, Overlay, SearchBar, ListItem } from "react-native-elements"
+import { NavigationContainer } from "@react-navigation/native"
 
+import firebase from "firebase"
 
-const ChatsScreen = () => {
+const ChatsScreen = ({ navigation }) => {
 
     const [chats, setChats] = useState([])
     const [visible, setVisible] = useState(false);
@@ -33,10 +35,25 @@ const ChatsScreen = () => {
 
     const newChat = (user) => {
         // user to begin chatting with
-        console.log(user)
-        //now we navigat to a new chat, passing user.id
-        //we also create new chat collection for the users involved.
-        //but that would be duplicating no? shittttt
+        // console.log(auth.currentUser)
+        // console.log(user)
+        const currentUser = { id: auth.currentUser.uid, displayName: auth.currentUser.displayName, email: auth.currentUser.email, photoURL: auth.currentUser.photoURL }
+        const otherUser = {
+            id: user.id, displayName: user.displayName, email: user.email, photoURL: user.photoURL ? user.photoURL : "https://www.trackergps.com/canvas/images/icons/avatar.jpg"
+        } //can remove the terniary later, just had to because one user had undefined data
+        const res = db.collection('chats').doc().set({
+            created: firebase.firestore.FieldValue.serverTimestamp()
+        })
+
+        db.collection("chats").doc(res.id).collection("participants").doc(auth.currentUser.id).set(currentUser)
+        db.collection("chats").doc(res.id).collection("participants").doc(user.id).set(otherUser)
+
+        //adds chat info to relevant users profile data
+        db.collection('users').doc(auth.currentUser.id).collection("chats").doc(res.id).collection("participants").doc(user.id).set(otherUser)
+        db.collection('users').doc(user.id).collection("chats").doc(res.id).collection("participants").doc(auth.currentUser.uid).set(currentUser)
+
+        toggleOverlay()
+        navigation.navigate("Chat", { chatId: res.id })
     }
 
 
@@ -56,7 +73,6 @@ const ChatsScreen = () => {
             />
             <FlatList
                 data={foundUsers}
-
                 numColumns={1}
                 horizontal={false}
                 renderItem={({ item }) => {
