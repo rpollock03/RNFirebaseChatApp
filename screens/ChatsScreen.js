@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native'
 
 import { auth, db } from "../firebase/config"
@@ -18,6 +18,39 @@ const ChatsScreen = ({ navigation }) => {
         setVisible(!visible);
     };
 
+    useEffect(() => {
+
+        const findExistingChats = async () => {
+
+            console.log(auth.currentUser.uid)
+            const chatsRef = db.collection("users").doc(`${auth.currentUser.uid}`).collection("chats")
+            const snapshot = await chatsRef.get()
+            if (snapshot.empty) {
+                console.log("no mathching documents")
+            }
+            console.log(snapshot.data)
+            snapshot.forEach(doc => {
+                console.log(doc.id, "=>", doc.data())
+            })
+        }
+
+        findExistingChats()
+        /*  .get()
+              .then((snapshot) => {
+                  console.log(snapshot.docs)
+                  let foundChats = snapshot.docs.map(doc => {
+                      console.log(doc)
+                      const data = doc.data()
+                      const id = doc.id
+                      return { id, ...data }
+                  })
+                  setChats(foundChats)
+              })*/
+    }, [])
+
+
+
+
     const findUsers = () => {
         console.log("searching for user: " + searchTerm)
         db.collection("users")
@@ -35,25 +68,36 @@ const ChatsScreen = ({ navigation }) => {
 
     const newChat = (user) => {
         // user to begin chatting with
-        // console.log(auth.currentUser)
-        // console.log(user)
-        const currentUser = { id: auth.currentUser.uid, displayName: auth.currentUser.displayName, email: auth.currentUser.email, photoURL: auth.currentUser.photoURL }
+        const currentUser = {
+            id: auth.currentUser.uid,
+            displayName: auth.currentUser.displayName,
+            email: auth.currentUser.email,
+            photoURL: auth.currentUser.photoURL
+        }
         const otherUser = {
-            id: user.id, displayName: user.displayName, email: user.email, photoURL: user.photoURL ? user.photoURL : "https://www.trackergps.com/canvas/images/icons/avatar.jpg"
-        } //can remove the terniary later, just had to because one user had undefined data
-        const res = db.collection('chats').doc().set({
-            created: firebase.firestore.FieldValue.serverTimestamp()
+            id: user.id,
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL ? user.photoURL : "https://www.trackergps.com/canvas/images/icons/avatar.jpg"
+        }
+
+        db.collection('chats').add({ //add generates new chat document and id
+            created: firebase.firestore.FieldValue.serverTimestamp() // when new chat was created
         })
+            .then(async (docRef) => {
 
-        db.collection("chats").doc(res.id).collection("participants").doc(auth.currentUser.id).set(currentUser)
-        db.collection("chats").doc(res.id).collection("participants").doc(user.id).set(otherUser)
+                const newChatId = docRef.id
+                const newChatMembersRef = db.collection("chats").doc(newChatId).collection("participants")
 
-        //adds chat info to relevant users profile data
-        db.collection('users').doc(auth.currentUser.id).collection("chats").doc(res.id).collection("participants").doc(user.id).set(otherUser)
-        db.collection('users').doc(user.id).collection("chats").doc(res.id).collection("participants").doc(auth.currentUser.uid).set(currentUser)
+                await newChatMembersRef.doc(`${auth.currentUser.uid}`).set(currentUser)
+                await newChatMembersRef.doc(`${user.id}`).set(otherUser)
 
-        toggleOverlay()
-        navigation.navigate("Chat", { chatId: res.id })
+                await db.collection('users').doc(`${auth.currentUser.uid}`).collection("chats").doc(`${newChatId}`).collection("participants").doc(`${user.id}`).set(otherUser)
+                await db.collection('users').doc(`${user.id}`).collection("chats").doc(`${newChatId}`).collection("participants").doc(`${auth.currentUser.uid}`).set(currentUser)
+
+                toggleOverlay()
+                navigation.navigate("Chat", { chatId: docRef.id })
+            })
     }
 
 
@@ -91,14 +135,29 @@ const ChatsScreen = ({ navigation }) => {
                 }
                 }
             />
-
-
-
-
         </Overlay>
+        <FlatList
+            data={chats}
+            numColumns={1}
+            horizontal={false}
+            renderItem={({ item }) => {
+                return (
+                    <TouchableOpacity >
+                        <ListItem bottomDivider>
+                            <Avatar source={{ uri: "https://www.trackergps.com/canvas/images/icons/avatar.jpg" }} />
+                            <ListItem.Content>
+                                <ListItem.Title>Chat with XYZ</ListItem.Title>
+                                <ListItem.Subtitle>started xyz</ListItem.Subtitle>
+                            </ListItem.Content>
+                            <ListItem.Chevron type="MaterialIcons" name="group-add" size={44} />
+                        </ListItem>
+                    </TouchableOpacity>
+                )
+            }
+            }
+        />
+
     </View>
-
-
     )
 }
 
