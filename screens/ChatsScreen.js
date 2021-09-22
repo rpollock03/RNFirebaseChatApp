@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native'
 
 import { auth, db } from "../firebase/config"
-import { Avatar, Icon, Button, Overlay, SearchBar, ListItem } from "react-native-elements"
+import { Avatar, Icon, Button, Overlay, SearchBar, ListItem, Input } from "react-native-elements"
 import { NavigationContainer } from "@react-navigation/native"
 
 import firebase from "firebase"
@@ -21,38 +21,26 @@ const ChatsScreen = ({ navigation }) => {
     useEffect(() => {
 
         const findExistingChats = async () => {
-
-            console.log(auth.currentUser.uid)
-            const chatsRef = db.collection("users").doc(`${auth.currentUser.uid}`).collection("chats")
-            const snapshot = await chatsRef.get()
-            if (snapshot.empty) {
-                console.log("no mathching documents")
-            }
-            console.log(snapshot.data)
-            snapshot.forEach(doc => {
-                console.log(doc.id, "=>", doc.data())
+            //find all chat ids involving user
+            const userSnapshot = await db.collection("users").doc(`${auth.currentUser.uid}`).collection("chats").get()
+            let foundChats = userSnapshot.docs.map(doc => {
+                const id = doc.id
+                const data = doc.data()
+                return ({ key: id, ...data }) //add key here because of RN requirement, otherwise key extractor needed.
             })
+            setChats(foundChats)
+            const chatSnapshot = await db.collection("chats").doc()
+
         }
 
         findExistingChats()
-        /*  .get()
-              .then((snapshot) => {
-                  console.log(snapshot.docs)
-                  let foundChats = snapshot.docs.map(doc => {
-                      console.log(doc)
-                      const data = doc.data()
-                      const id = doc.id
-                      return { id, ...data }
-                  })
-                  setChats(foundChats)
-              })*/
+
     }, [])
 
 
 
 
     const findUsers = () => {
-        console.log("searching for user: " + searchTerm)
         db.collection("users")
             .where("displayName", ">=", searchTerm)
             .get()
@@ -60,7 +48,7 @@ const ChatsScreen = ({ navigation }) => {
                 let users = snapshot.docs.map(doc => {
                     const data = doc.data()
                     const id = doc.id
-                    return { id, ...data }
+                    return { key: id, ...data }
                 })
                 setFoundUsers(users)
             })
@@ -87,16 +75,21 @@ const ChatsScreen = ({ navigation }) => {
             .then(async (docRef) => {
 
                 const newChatId = docRef.id
-                const newChatMembersRef = db.collection("chats").doc(newChatId).collection("participants")
+                const batch = db.batch()
+                //RESET
+                batch.set(db.collection("chats").doc(newChatId).collection("participants").doc(`${auth.currentUser.uid}`), currentUser)
+                batch.set(db.collection("chats").doc(newChatId).collection("participants").doc(`${user.id}`), otherUser)
 
-                await newChatMembersRef.doc(`${auth.currentUser.uid}`).set(currentUser)
-                await newChatMembersRef.doc(`${user.id}`).set(otherUser)
+                batch.set(db.collection('users').doc(`${auth.currentUser.uid}`).collection("chats").doc(`${newChatId}`), { created: firebase.firestore.FieldValue.serverTimestamp(), id: newChatId })
 
-                await db.collection('users').doc(`${auth.currentUser.uid}`).collection("chats").doc(`${newChatId}`).collection("participants").doc(`${user.id}`).set(otherUser)
-                await db.collection('users').doc(`${user.id}`).collection("chats").doc(`${newChatId}`).collection("participants").doc(`${auth.currentUser.uid}`).set(currentUser)
+                batch.set(db.collection('users').doc(`${user.id}`).collection("chats").doc(`${newChatId}`), { created: firebase.firestore.FieldValue.serverTimestamp(), id: newChatId })
 
+                batch.set(db.collection('users').doc(`${auth.currentUser.uid}`).collection("chats").doc(`${newChatId}`).collection("participants").doc(`${user.id}`), otherUser)
+                batch.set(db.collection('users').doc(`${user.id}`).collection("chats").doc(`${newChatId}`).collection("participants").doc(`${auth.currentUser.uid}`), currentUser)
+
+                await batch.commit()
                 toggleOverlay()
-                navigation.navigate("Chat", { chatId: docRef.id })
+                navigation.navigate("Chat", { chatId: newChatId })
             })
     }
 
@@ -119,7 +112,7 @@ const ChatsScreen = ({ navigation }) => {
                 data={foundUsers}
                 numColumns={1}
                 horizontal={false}
-                renderItem={({ item }) => {
+                renderItem={({ item, index }) => {
                     return (
                         <TouchableOpacity onPress={() => newChat(item)}>
                             <ListItem bottomDivider>
@@ -141,6 +134,7 @@ const ChatsScreen = ({ navigation }) => {
             numColumns={1}
             horizontal={false}
             renderItem={({ item }) => {
+                console.log(item)
                 return (
                     <TouchableOpacity >
                         <ListItem bottomDivider>
