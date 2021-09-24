@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { Image, View, StyleSheet } from "react-native"
+import { Image, View, StyleSheet, ActivityIndicator } from "react-native"
 import { Button, Text, Input } from "react-native-elements"
 
 import Spacer from "../components/Spacer"
+
+import {
+    useFonts,
+    LeckerliOne_400Regular
+} from '@expo-google-fonts/leckerli-one'
+
 
 import { auth } from "../firebase/config"
 
@@ -33,16 +39,22 @@ const LandingScreen = ({ navigation }) => {
         });
     }
 
-    return (<View style={styles.container}>
-        <Image style={{ width: 120, height: 120, marginLeft: "auto", marginRight: "auto" }} source={require('../assets/logo.png')} />
-        <Text h2 style={styles.title}>What's the craic?</Text>
-        <Text h4 style={styles.subtitle}>An Irish Messaging service</Text>
-        {currentUser ? <Button title={`Continue as @${currentUser}`}
-            onPress={() => navigation.navigate("Chats")} />
-            : <Button title="Sign in" onPress={() => navigation.replace("Login")} />}
+    let [fontsLoaded, error] = useFonts({
+        LeckerliOne_400Regular
+    })
 
-        {currentUser ? <Button type="clear" title="Switch account" onPress={signOut} /> : null}
+    if (!fontsLoaded) {
+        return <ActivityIndicator size="large" />
+    } else return (<View style={styles.container}>
+        <Text style={styles.title}>hmu</Text>
+        <Text h4 style={styles.subtitle}>Welcome to hit me up</Text>
+        <View style={styles.buttonCont}>
+            {currentUser ? <Button title={`Continue as @${currentUser}`}
+                onPress={() => navigation.navigate("Chats")} />
+                : <Button title="Sign in" onPress={() => navigation.replace("Login")} />}
 
+            {currentUser ? <Button type="clear" title="Switch account" onPress={signOut} /> : null}
+        </View>
     </View>
     )
 }
@@ -58,13 +70,18 @@ const styles = StyleSheet.create({
     },
     title: {
         textAlign: "center",
-        marginTop: 40
+        color: "#ffb347",
+        marginTop: 40,
+        fontSize: 100,
+        fontFamily: "LeckerliOne_400Regular"
     },
     subtitle: {
-        marginTop: 10,
-        marginBottom: 90,
         color: "grey",
-        textAlign: "center"
+        textAlign: "center",
+    },
+    buttonCont: {
+        marginTop: "auto",
+        marginBottom: "25%"
     }
 
 })

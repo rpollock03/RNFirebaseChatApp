@@ -30,11 +30,8 @@ const ChatsScreen = ({ navigation }) => {
             })
             setChats(foundChats)
             const chatSnapshot = await db.collection("chats").doc()
-
         }
-
         findExistingChats()
-
     }, [])
 
 
