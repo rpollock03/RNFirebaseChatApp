@@ -2,8 +2,14 @@ import React, { useState, useEffect } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native'
 
 import { auth, db } from "../firebase/config"
-import { Avatar, Icon, Button, Overlay, SearchBar, ListItem, Input } from "react-native-elements"
+import { Avatar, Icon, Button, Overlay, SearchBar, ListItem, Input, Header } from "react-native-elements"
 import { NavigationContainer } from "@react-navigation/native"
+
+import {
+    useFonts,
+    LeckerliOne_400Regular
+} from '@expo-google-fonts/leckerli-one'
+
 
 import firebase from "firebase"
 
@@ -29,6 +35,7 @@ const ChatsScreen = ({ navigation }) => {
                 return ({ key: id, ...data }) //add key here because of RN requirement, otherwise key extractor needed.
             })
             setChats(foundChats)
+
             const chatSnapshot = await db.collection("chats").doc()
         }
         findExistingChats()
@@ -92,8 +99,17 @@ const ChatsScreen = ({ navigation }) => {
 
 
     return (<View>
-        <Text>This is the chats screen, all your chats are here!</Text>
-        <Button title="new chat" onPress={toggleOverlay} />
+        <Header
+            leftComponent={<Icon type="MaterialIcons" name="person-outline" size={36} color="#fff" containerStyle={{ marginTop: 14 }} />}
+            centerComponent={{ text: 'hmu', style: { color: '#fff', fontSize: 40, fontFamily: "LeckerliOne_400Regular" } }}
+            rightComponent={<Icon type="MaterialIcons" name="person-search" size={36} color="#fff" containerStyle={{ marginTop: 14 }} onPress={toggleOverlay} />}
+            containerStyle={{
+                backgroundColor: "#ffb347",
+                justifyContent: 'space-around',
+
+            }}
+        />
+
         <Overlay isVisible={visible} onBackdropPress={toggleOverlay}
             overlayStyle={{ width: "80%", height: "80%", }}
         >
