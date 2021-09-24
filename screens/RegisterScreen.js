@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { Button, Input } from "react-native-elements"
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { Button, Input, Header, Text } from "react-native-elements"
 
 import { auth, db } from "../firebase/config"
+import Spacer from "../components/Spacer"
 
 
 const RegisterScreen = ({ navigation }) => {
@@ -46,51 +47,73 @@ const RegisterScreen = ({ navigation }) => {
 
 
     return (
-        <View style={styles.container}>
-            <Input
-                placeholder='Enter your name'
-                label='Name'
-                leftIcon={{ type: 'material', name: 'badge' }}
-                value={name}
-                onChangeText={text => setName(text)}
+        <View>
+            <Header
+                centerComponent={{
+                    text: 'hmu', style: {
+                        color: '#fff', fontSize: 60, fontFamily: "LeckerliOne_400Regular"
+                    }
+                }}
+                containerStyle={{
+                    backgroundColor: "#ffb347",
+
+                }}
+
             />
-            <Input
-                placeholder='Enter your email'
-                label='Email'
-                leftIcon={{ type: 'material', name: 'email' }}
-                value={email}
-                onChangeText={text => setEmail(text)}
-            />
-            <Input
-                placeholder='Enter your password'
-                label='Password'
-                leftIcon={{ type: 'material', name: 'lock' }}
-                value={password} onChangeText={text => setPassword(text)}
-                secureTextEntry
-            />
-            <Input
-                placeholder='Enter your image url'
-                label='Profile Picture'
-                leftIcon={{ type: 'material', name: 'face' }}
-                onChangeText={text => setImageUrl(text)}
-            />
-            <Button
-                title="register" style={styles.button}
-                onPress={register}
-            />
+
+            <View style={styles.container}>
+                <Text h3 style={{ color: "grey", marginBottom: 20, fontWeight: "bold" }}>Sign up</Text>
+                <Input
+                    placeholder='Enter your name'
+                    label='Name'
+                    leftIcon={{ type: 'material', name: 'badge' }}
+                    value={name}
+                    onChangeText={text => setName(text)}
+                />
+                <Input
+                    placeholder='Enter your email'
+                    label='Email'
+                    leftIcon={{ type: 'material', name: 'email' }}
+                    value={email}
+                    onChangeText={text => setEmail(text)}
+                />
+                <Input
+                    placeholder='Enter your password'
+                    label='Password'
+                    leftIcon={{ type: 'material', name: 'lock' }}
+                    value={password} onChangeText={text => setPassword(text)}
+                    secureTextEntry
+                />
+                <Input
+                    placeholder='Enter your image url'
+                    label='Profile Picture'
+                    leftIcon={{ type: 'material', name: 'face' }}
+                    onChangeText={text => setImageUrl(text)}
+                />
+                <Button
+                    title="register" style={styles.button}
+                    onPress={register}
+                />
+                <TouchableOpacity onPress={() => navigation.navigate("Login")}><Spacer><Text style={styles.link}>Already have an account? <Text style={{ fontWeight: "bold" }}>Sign in instead</Text></Text></Spacer></TouchableOpacity>
+            </View>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         alignItems: 'center',
         padding: 10
+
     },
     button: {
         width: 200,
-        marginTop: 10
+        marginTop: 20
+    },
+    link: {
+        color: "grey",
+        textAlign: "center",
+        marginTop: 20
     }
 })
 export default RegisterScreen
