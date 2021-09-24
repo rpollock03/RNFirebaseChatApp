@@ -111,13 +111,16 @@ const ChatsScreen = ({ navigation }) => {
         />
 
         <Overlay isVisible={visible} onBackdropPress={toggleOverlay}
-            overlayStyle={{ width: "80%", height: "80%", }}
+            overlayStyle={{ width: "90%", height: "90%", borderRadius: 20 }}
+
         >
-            <Text>Who do you want to chat with?</Text>
             <SearchBar
                 placeholder="Search for a user"
                 onChangeText={(search) => { setSearchTerm(search) }}
                 value={searchTerm}
+                lightTheme
+                round
+                containerStyle={{ borderRadius: 20 }}
                 searchIcon={{ type: "font-awesome", name: "search" }}
                 onSubmitEditing={() => findUsers()}
             />
