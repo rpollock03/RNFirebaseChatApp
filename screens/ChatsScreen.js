@@ -32,7 +32,7 @@ const ChatsScreen = ({ navigation }) => {
             let foundChats = userSnapshot.docs.map(doc => {
                 const id = doc.id
                 const data = doc.data()
-                return ({ key: id, ...data }) //add key here because of RN requirement, otherwise key extractor needed.
+                return ({ id, key: id, ...data }) //add key here because of RN requirement, otherwise key extractor needed.
             })
             setChats(foundChats)
 
@@ -42,17 +42,18 @@ const ChatsScreen = ({ navigation }) => {
     }, [])
 
 
-
-
     const findUsers = () => {
         db.collection("users")
             .where("displayName", ">=", searchTerm)
             .get()
             .then((snapshot) => {
                 let users = snapshot.docs.map(doc => {
+
                     const data = doc.data()
                     const id = doc.id
-                    return { key: id, ...data }
+                    return { id, key: id, ...data }
+
+
                 })
                 setFoundUsers(users)
             })
@@ -80,16 +81,16 @@ const ChatsScreen = ({ navigation }) => {
 
                 const newChatId = docRef.id
                 const batch = db.batch()
+                console.log(user)
+                console.log(auth.currentUser)
                 //RESET
                 batch.set(db.collection("chats").doc(newChatId).collection("participants").doc(`${auth.currentUser.uid}`), currentUser)
                 batch.set(db.collection("chats").doc(newChatId).collection("participants").doc(`${user.id}`), otherUser)
 
-                batch.set(db.collection('users').doc(`${auth.currentUser.uid}`).collection("chats").doc(`${newChatId}`), { created: firebase.firestore.FieldValue.serverTimestamp(), id: newChatId })
+                //add details of who the chat is with for efficient database retrieval of users chats. Can update later with a number of people in chat for purposes of adding "and others" for example
+                batch.set(db.collection('users').doc(`${auth.currentUser.uid}`).collection("chats").doc(`${newChatId}`), { created: firebase.firestore.FieldValue.serverTimestamp(), chatId: newChatId, noOfParticipants: 1, withId: user.id, withDisplayName: user.displayName, withEmail: user.email, withPhotoURL: user.photoURL ? user.photoURL : "https://www.trackergps.com/canvas/images/icons/avatar.jpg" })
 
-                batch.set(db.collection('users').doc(`${user.id}`).collection("chats").doc(`${newChatId}`), { created: firebase.firestore.FieldValue.serverTimestamp(), id: newChatId })
-
-                batch.set(db.collection('users').doc(`${auth.currentUser.uid}`).collection("chats").doc(`${newChatId}`).collection("participants").doc(`${user.id}`), otherUser)
-                batch.set(db.collection('users').doc(`${user.id}`).collection("chats").doc(`${newChatId}`).collection("participants").doc(`${auth.currentUser.uid}`), currentUser)
+                batch.set(db.collection('users').doc(`${user.id}`).collection("chats").doc(`${newChatId}`), { created: firebase.firestore.FieldValue.serverTimestamp(), chatId: newChatId, noOfParticipants: 1, withId: auth.currentUser.uid, withDisplayName: auth.currentUser.displayName, withEmail: auth.currentUser.email, withPhotoURL: auth.currentUser.photoURL })
 
                 await batch.commit()
                 toggleOverlay()
