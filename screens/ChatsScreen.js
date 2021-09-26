@@ -81,9 +81,7 @@ const ChatsScreen = ({ navigation }) => {
 
                 const newChatId = docRef.id
                 const batch = db.batch()
-                console.log(user)
-                console.log(auth.currentUser)
-                //RESET
+
                 batch.set(db.collection("chats").doc(newChatId).collection("participants").doc(`${auth.currentUser.uid}`), currentUser)
                 batch.set(db.collection("chats").doc(newChatId).collection("participants").doc(`${user.id}`), otherUser)
 
@@ -151,16 +149,17 @@ const ChatsScreen = ({ navigation }) => {
             numColumns={1}
             horizontal={false}
             renderItem={({ item }) => {
-                console.log(item)
+
                 return (
-                    <TouchableOpacity >
+
+                    < TouchableOpacity onPress={() => navigation.navigate("Chat", { chatId: item.id })}>
                         <ListItem bottomDivider>
-                            <Avatar source={{ uri: "https://www.trackergps.com/canvas/images/icons/avatar.jpg" }} />
+                            <Avatar source={{ uri: item.withPhotoURL }} />
                             <ListItem.Content>
-                                <ListItem.Title>Chat with XYZ</ListItem.Title>
-                                <ListItem.Subtitle>started xyz</ListItem.Subtitle>
+                                <ListItem.Title>@{item.withDisplayName}</ListItem.Title>
+                                <ListItem.Subtitle>{new Date(item.created.seconds * 1000).toString().substr(0, 15)}</ListItem.Subtitle>
                             </ListItem.Content>
-                            <ListItem.Chevron type="MaterialIcons" name="group-add" size={44} />
+                            <ListItem.Chevron type="MaterialIcons" name="message" size={44} />
                         </ListItem>
                     </TouchableOpacity>
                 )
@@ -168,7 +167,7 @@ const ChatsScreen = ({ navigation }) => {
             }
         />
 
-    </View>
+    </View >
     )
 }
 
