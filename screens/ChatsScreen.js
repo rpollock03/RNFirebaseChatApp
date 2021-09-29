@@ -152,6 +152,7 @@ const ChatsScreen = ({ navigation }) => {
 
                 return (
 
+
                     < TouchableOpacity onPress={() => navigation.navigate("Chat", { chatId: item.id })}>
                         <ListItem bottomDivider>
                             <Avatar source={{ uri: item.withPhotoURL }} />

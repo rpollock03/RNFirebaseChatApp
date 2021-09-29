@@ -67,7 +67,7 @@ const RegisterScreen = ({ navigation }) => {
             mediaTypes: ImagePicker.MediaTypeOptions.Images, //can change to All or Videos
             allowsEditing: true,
             aspect: [1, 1],
-            quality: 0.1,
+            quality: 0,
         });
 
         if (!result.cancelled) {

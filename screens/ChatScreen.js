@@ -5,6 +5,7 @@ import { GiftedChat } from 'react-native-gifted-chat'
 
 import { auth, db } from "../firebase/config"
 
+
 const ChatScreen = (props) => {
 
     const [messages, setMessages] = useState([]);
@@ -77,13 +78,14 @@ const ChatScreen = (props) => {
         })
     }, [])
 
+
+
     return (
         <GiftedChat
             showAvatarForEveryMessage={true}
             showUserAvatar={true}
             renderAvatarOnTop
             messages={messages}
-
             onSend={messages => onSend(messages)}
             user={{
                 _id: 1,
