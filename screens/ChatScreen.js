@@ -6,6 +6,7 @@ import { GiftedChat } from 'react-native-gifted-chat'
 import { auth, db } from "../firebase/config"
 
 
+
 const ChatScreen = (props) => {
 
     const [messages, setMessages] = useState([]);
@@ -14,25 +15,18 @@ const ChatScreen = (props) => {
         props.navigation.setOptions({
             // title: value === '' ? 'No title' : value,
             headerLeft: () => (
-                <View style={{ marginLeft: 20 }}>
-                    <Avatar
-                        rounded
-                        source={{
-                            uri: auth?.currentUser?.photoURL,
-                        }}
+                <View style={{ marginLeft: 10 }}>
+                    <Icon
+                        type="Feather" name="chevron-left" size={42} onPress={() => props.navigation.goBack()}
+
                     />
                 </View>
             ),
-            headerRight: () => (
-                <TouchableOpacity style={{
-                    marginRight: 10
-                }}
-                    onPress={signOut}
-                >
-                    <Icon type="AntDesign" name="logout" size={24} color="black" />
-                </TouchableOpacity>
-            )
+            title: <Text style={{ fontWeight: "bold" }}>{props.route.params.name}</Text>,
+
         });
+
+
     }, [props.navigation]);
 
     const signOut = () => {
@@ -86,6 +80,7 @@ const ChatScreen = (props) => {
             showUserAvatar={true}
             renderAvatarOnTop
             messages={messages}
+            placeholder={`Message ${props.route.params.name}...`}
             onSend={messages => onSend(messages)}
             user={{
                 _id: 1,
@@ -95,6 +90,7 @@ const ChatScreen = (props) => {
                 name: auth?.currentUser?.displayName,
                 avatar: auth?.currentUser?.photoURL
             }}
+
         />
     )
 }

@@ -47,17 +47,27 @@ const ChatsScreen = ({ navigation }) => {
             .where("displayName", ">=", searchTerm)
             .get()
             .then((snapshot) => {
-                let users = snapshot.docs.map(doc => {
 
-                    const data = doc.data()
-                    const id = doc.id
-                    return { id, key: id, ...data }
+                let users = snapshot.docs.filter(doc => {
 
-
+                    if (doc.data().email === auth.currentUser.email) {
+                        return false
+                    }
+                    return true
                 })
+                    .map(doc => {
+                        const data = doc.data()
+                        const id = doc.id
+                        return { id, key: id, ...data }
+                    })
                 setFoundUsers(users)
             })
     }
+
+
+
+
+
 
     const newChat = (user) => {
         // user to begin chatting with
@@ -99,7 +109,15 @@ const ChatsScreen = ({ navigation }) => {
 
     return (<View>
         <Header
-            leftComponent={<Icon type="MaterialIcons" name="person-outline" size={36} color="#fff" containerStyle={{ marginTop: 14 }} />}
+            leftComponent={<Avatar
+                rounded
+                source={{
+                    uri: auth?.currentUser?.photoURL,
+                }}
+                containerStyle={{ marginTop: 16, marginLeft: 4 }}
+            />}
+
+
             centerComponent={{ text: 'hmu', style: { color: '#fff', fontSize: 40, fontFamily: "LeckerliOne_400Regular" } }}
             rightComponent={<Icon type="MaterialIcons" name="person-search" size={36} color="#fff" containerStyle={{ marginTop: 14 }} onPress={toggleOverlay} />}
             containerStyle={{
@@ -149,11 +167,8 @@ const ChatsScreen = ({ navigation }) => {
             numColumns={1}
             horizontal={false}
             renderItem={({ item }) => {
-
                 return (
-
-
-                    < TouchableOpacity onPress={() => navigation.navigate("Chat", { chatId: item.id })}>
+                    < TouchableOpacity onPress={() => navigation.navigate("Chat", { chatId: item.id, name: item.withDisplayName })}>
                         <ListItem bottomDivider>
                             <Avatar source={{ uri: item.withPhotoURL }} />
                             <ListItem.Content>
